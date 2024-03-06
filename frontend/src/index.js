@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { ThirdwebProvider } from '@thirdweb-dev/react';
 import App from './pages/App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <ThirdwebProvider clientId={process.env.REACT_APP_CLIENT_ID}>
     <App />
+    </ThirdwebProvider>
   </React.StrictMode>
 );
 
