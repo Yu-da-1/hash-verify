@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
-import { useMetamask, useAddress, useDisconnect, useContract, useSigner } from '@thirdweb-dev/react';
+import React, { useState, useEffect } from 'react';
+import { useWallet } from '../hooks/connect';
+import { ethers } from 'ethers';
 import { generateFileHash } from '../utils/hash';
 
-//const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-//const contractABI = JSON.parse(process.env.REACT_APP_CONTRACT_ABI);
+const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+const contractABI = JSON.parse(process.env.REACT_APP_CONTRACT_ABI);
 
 
 function App() {
-  const connectWithMetamask = useMetamask();
-  const address = useAddress();
-  const disconnect = useDisconnect();
+  console.log(useWallet);
+  const { connectWithMetamask, disconnect, address, isConnected, signer } = useWallet();
   const [file, setFile] = useState(null);
-  const { data: signer} = useSigner();
-  //const contract = useContract(contractAddress, contractABI, signer);
+  const [contract, setContract] = useState(null);
+
+  useEffect(() => {
+    if (signer) {
+      // signer が存在する場合にのみコントラクトを初期化
+      const contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
+      setContract(contractInstance);
+    } else {
+      // signer が存在しない場合はコントラクトを null に設定
+      setContract(null);
+    }
+  }, [signer]);
 
 
   const handleFileChange = (event) => {
@@ -25,6 +35,12 @@ function App() {
       alert("ファイルが選択されていません");
       return;
     }
+
+    if (!signer) {
+      alert("ウォレットに接続してください");
+      return;
+    }
+
     const hash = await generateFileHash(file);
     console.log("Generated hash", hash);
 
@@ -41,7 +57,7 @@ function App() {
   return (
     <div>
       <h1>Verify Hash</h1>
-      {address ? (
+      {isConnected ? (
         <>
           <p>Connected as: {address}</p>
           <button onClick={() => disconnect()}>Disconnect Wallet</button>
