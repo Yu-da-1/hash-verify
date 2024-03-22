@@ -1,18 +1,13 @@
-require("@nomicfoundation/hardhat-ethers");
-//require("@nomiclabs/hardhat-waffle");
+require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.4",
+  solidity: "0.8.24",
   networks: {
-    // ネットワーク設定（ローカル環境やテストネットなど）
-    localhost: {
-      url: "http://127.0.0.1:8545"
+    Amoy: {
+      url: process.env.ALCHEMY_KEY,
+      accounts: [process.env.PRIVATE_KEY].filter(Boolean)
     },
-    hardhat: {
-      // Hardhat ネットワークの設定
-    },
-    // 他のネットワーク設定...
   },
-  // その他の設定...
 };
